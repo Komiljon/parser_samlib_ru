@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
+import os.path
 import numpy as np
 import pandas as pd
 import time
@@ -37,34 +38,44 @@ def getEmail(url):
 
 
 # Create csv file
-with open(emails_data_csv, "w", encoding="utf-8") as file:
-    writer = csv.writer(file, delimiter=';')
-    writer.writerow(
-        (
-            'name',
-            'url',
-            'email'
+if os.path.exists(emails_data_csv):
+    res_read = pd.read_csv(emails_data_csv, delimiter=';')
+    ok_count = res_read.name.count()
+else:
+    with open(emails_data_csv, "w", encoding="utf-8") as file:
+        writer = csv.writer(file, delimiter=';')
+        writer.writerow(
+            (
+                'name',
+                'url',
+                'email'
+            )
         )
-    )
 
-# Create csv file
-with open(error_data_csv, "w", encoding="utf-8") as file:
-    writer = csv.writer(file, delimiter=';')
-    writer.writerow(
-        (
-            'name',
-            'url',
-            'email'
+
+if os.path.exists(error_data_csv):
+    er_read = pd.read_csv(error_data_csv, delimiter=';')
+    er_count = er_read.name.count()
+else:
+    # Create csv file
+    with open(error_data_csv, "w", encoding="utf-8") as file:
+        writer = csv.writer(file, delimiter=';')
+        writer.writerow(
+            (
+                'name',
+                'url',
+                'email'
+            )
         )
-    )
 
 #Получаем url  url_list.csv
 article_read = pd.read_csv(csv_file, delimiter=';')
 result = article_read[['name', 'url']]
 counts = article_read.url.count()
 
+
 #Начинаем парсить полученные адреса
-for i in range(counts):
+for i in range(ok_count, counts):
     name = result['name'][i]
     url = result['url'][i]
     resEmail = getEmail(url)
@@ -89,9 +100,7 @@ for i in range(counts):
                     resEmail
                 )
             )
-        ok_count += 1
-    if i >= 5000:
-        time.sleep(3)
+        ok_count += 1 
 
 print('success: ' + str(ok_count))
 print('errors: ' + str(er_count))
