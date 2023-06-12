@@ -1,12 +1,9 @@
 import requests
-import re
 from bs4 import BeautifulSoup
-import wget
 import csv
 import numpy as np
 import pandas as pd
-import os
-from os.path import exists
+import time
 
 ok_count = 0
 er_count = 0
@@ -16,28 +13,6 @@ output_dir = 'Data/img'
 csv_file = 'Data/url_list.csv'
 emails_data_csv = 'Data/result_list.csv'
 error_data_csv = 'Data/error_list.csv'
-
-# Create csv file
-with open(emails_data_csv, "w", encoding="utf-8") as file:
-    writer = csv.writer(file, delimiter=';')
-    writer.writerow(
-        (
-            'name',
-            'url',
-            'email'
-        )
-    )
-
-# Create csv file
-with open(error_data_csv, "w", encoding="utf-8") as file:
-    writer = csv.writer(file, delimiter=';')
-    writer.writerow(
-        (
-            'name',
-            'url',
-            'email'
-        )
-    )
 
 def getEmail(url):
     headers = {
@@ -60,6 +35,28 @@ def getEmail(url):
         email = 'None'
     return email
 
+
+# Create csv file
+with open(emails_data_csv, "w", encoding="utf-8") as file:
+    writer = csv.writer(file, delimiter=';')
+    writer.writerow(
+        (
+            'name',
+            'url',
+            'email'
+        )
+    )
+
+# Create csv file
+with open(error_data_csv, "w", encoding="utf-8") as file:
+    writer = csv.writer(file, delimiter=';')
+    writer.writerow(
+        (
+            'name',
+            'url',
+            'email'
+        )
+    )
 
 #Получаем url  url_list.csv
 article_read = pd.read_csv(csv_file, delimiter=';')
@@ -93,8 +90,8 @@ for i in range(counts):
                 )
             )
         ok_count += 1
-    if i >= 10:
-        break
+    if i >= 5000:
+        time.sleep(3)
 
 print('success: ' + str(ok_count))
 print('errors: ' + str(er_count))
